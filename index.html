@@ -43,3 +43,14 @@ const clock = setInterval(() => {
 move();
 </script>
 <div id="reactionTime">Reaktionszeit: 0 ms</div>
+let startTime = performance.now();
+let reactionTime = 0;
+	reactionTime = Math.round(performance.now() - startTime);
+console.log("Reaktionszeit: " + reactionTime + " ms");
+
+startTime = performance.now();
+	reactionTime = Math.round(performance.now() - startTime);
+document.getElementById("reactionTime").textContent =
+    "Reaktionszeit: " + reactionTime + " ms";
+
+startTime = performance.now();
