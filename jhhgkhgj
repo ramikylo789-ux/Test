@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="de">
+<meta charset="utf-8">
+<title>Fang den Punkt</title>
+<style>
+	body { margin:0; display:grid; place-items:center; height:100vh; background:#111; color:white; font:20px sans-serif }
+	main { text-align:center } canvas { display:block; background:#222; border:2px solid #555; cursor:crosshair }
+</style>
+<main>
+	<h1>Fang den Punkt</h1>
+	<p>Punkte: <b id="score">0</b> | Zeit: <b id="time">30</b>s</p>
+	<canvas id="game" width="600" height="400"></canvas>
+	<p id="message">Klicke auf den roten Punkt!</p>
+</main>
+<script>
+const canvas = document.querySelector('#game'), ctx = canvas.getContext('2d');
+const scoreEl = document.querySelector('#score'), timeEl = document.querySelector('#time');
+let score = 0, time = 30, x = 300, y = 200, radius = 22, playing = true;
+
+function draw() {
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	if (!playing) return;
+	ctx.fillStyle = '#f44'; ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.fill();
+}
+function move() {
+	x = radius + Math.random() * (canvas.width - radius * 2);
+	y = radius + Math.random() * (canvas.height - radius * 2);
+	draw();
+}
+canvas.onclick = event => {
+	if (!playing) return;
+	const r = canvas.getBoundingClientRect();
+	const hit = Math.hypot(event.clientX - r.left - x, event.clientY - r.top - y) <= radius;
+	if (hit) { score++; scoreEl.textContent = score; move(); }
+};
+const clock = setInterval(() => {
+	if (--time <= 0) {
+		time = 0; playing = false; clearInterval(clock);
+		document.querySelector('#message').textContent = `Spiel vorbei! Du hast ${score} Punkte.`;
+	}
+	timeEl.textContent = time;
+}, 1000);
+move();
+</script>
