@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Reaktionsspiel</title>
 
     <style>
@@ -16,12 +15,17 @@
         }
 
         h1 {
-            margin-top: 30px;
+            margin-top: 25px;
         }
 
         #info {
-            font-size: 22px;
-            margin: 15px;
+            font-size: 20px;
+            margin: 10px;
+        }
+
+        #timer {
+            font-size: 24px;
+            margin: 10px;
         }
 
         #game {
@@ -47,11 +51,11 @@
 
         button {
             padding: 12px 25px;
+            margin: 5px;
             font-size: 18px;
             border: none;
             border-radius: 10px;
             cursor: pointer;
-            margin: 5px;
         }
 
         #start {
@@ -63,6 +67,18 @@
             background: #444;
             color: white;
         }
+
+        #results {
+            max-width: 500px;
+            margin: 20px auto;
+            text-align: left;
+            font-size: 18px;
+        }
+
+        .result {
+            padding: 8px;
+            border-bottom: 1px solid #444;
+        }
     </style>
 </head>
 
@@ -71,15 +87,11 @@
     <h1>🎯 Reaktionsspiel</h1>
 
     <div id="info">
-        Klicke auf den roten Punkt so schnell wie möglich!
+        Runde: 0 / 10
     </div>
 
-    <div id="time">
+    <div id="timer">
         Letzte Zeit: -
-    </div>
-
-    <div id="best">
-        Beste Zeit: -
     </div>
 
     <button id="start" onclick="startGame()">
@@ -91,33 +103,82 @@
     </button>
 
     <div id="game">
-
         <div id="target" onclick="targetClicked()"></div>
+    </div>
 
+    <h2>📊 Deine Zeiten</h2>
+
+    <div id="results">
+        Noch keine Ergebnisse.
     </div>
 
     <script>
 
         let startTime = 0;
 
-        let bestTime = null;
+        let round = 0;
+
+        let times = [];
 
         let gameRunning = false;
+
+        let waiting = false;
 
 
         function startGame() {
 
+            round = 0;
+
+            times = [];
+
             gameRunning = false;
 
+            waiting = false;
+
+            document.getElementById("results").innerHTML =
+                "Noch keine Ergebnisse.";
+
+            document.getElementById("timer").textContent =
+                "Letzte Zeit: -";
+
+            nextRound();
+
+        }
+
+
+        function nextRound() {
+
+            if (round >= 10) {
+
+                finishGame();
+
+                return;
+
+            }
+
+
+            round++;
+
+            gameRunning = false;
+
+            waiting = true;
+
+
             document.getElementById("info").textContent =
+                "Runde: " + round + " / 10";
+
+            document.getElementById("timer").textContent =
                 "Warte auf den Punkt...";
 
-            document.getElementById("target").style.display = "none";
+
+            document.getElementById("target").style.display =
+                "none";
 
 
-            // Zufällige Wartezeit
+            // Zufällige Wartezeit zwischen 1 und 3 Sekunden
+
             let waitTime =
-                Math.floor(Math.random() * 3000) + 1000;
+                Math.floor(Math.random() * 2000) + 1000;
 
 
             setTimeout(function() {
@@ -138,7 +199,6 @@
                 document.getElementById("game");
 
 
-            // Zufällige Position
             let maxX =
                 game.clientWidth - 50;
 
@@ -153,18 +213,30 @@
                 Math.random() * maxY;
 
 
-            target.style.left = x + "px";
+            target.style.left =
+                x + "px";
 
-            target.style.top = y + "px";
+            target.style.top =
+                y + "px";
 
 
-            target.style.display = "block";
+            target.style.display =
+                "block";
 
 
-            // ⏱️ Zeitmessung startet hier
-            startTime = performance.now();
+            // Zeitmessung starten
+
+            startTime =
+                performance.now();
+
 
             gameRunning = true;
+
+            waiting = false;
+
+
+            document.getElementById("timer").textContent =
+                "Zeit läuft...";
 
         }
 
@@ -172,16 +244,25 @@
         function targetClicked() {
 
             if (!gameRunning) {
+
                 return;
+
             }
 
 
-            // ⏱️ Zeitmessung stoppen
-            let endTime = performance.now();
+            // Zeitmessung stoppen
+
+            let endTime =
+                performance.now();
 
 
             let reactionTime =
-                Math.round(endTime - startTime);
+                Math.round(
+                    endTime - startTime
+                );
+
+
+            times.push(reactionTime);
 
 
             gameRunning = false;
@@ -191,27 +272,107 @@
                 "none";
 
 
-            // Zeit anzeigen
-            document.getElementById("time").textContent =
-                "Letzte Zeit: " + reactionTime + " ms";
+            document.getElementById("timer").textContent =
+                "Letzte Zeit: " +
+                reactionTime +
+                " ms";
 
 
-            // Beste Zeit überprüfen
-            if (
-                bestTime === null ||
-                reactionTime < bestTime
-            ) {
+            showResults();
 
-                bestTime = reactionTime;
 
-                document.getElementById("best").textContent =
-                    "🏆 Beste Zeit: " + bestTime + " ms";
+            // Kurz warten und nächste Runde starten
 
-            }
+            setTimeout(function() {
+
+                nextRound();
+
+            }, 700);
+
+        }
+
+
+        function showResults() {
+
+            let results =
+                document.getElementById("results");
+
+
+            results.innerHTML = "";
+
+
+            times.forEach(function(time, index) {
+
+                let row =
+                    document.createElement("div");
+
+
+                row.className =
+                    "result";
+
+
+                row.textContent =
+                    "Runde " +
+                    (index + 1) +
+                    ": " +
+                    time +
+                    " ms";
+
+
+                results.appendChild(row);
+
+            });
+
+        }
+
+
+        function finishGame() {
+
+            gameRunning = false;
+
+
+            document.getElementById("target").style.display =
+                "none";
+
+
+            let total = 0;
+
+
+            times.forEach(function(time) {
+
+                total += time;
+
+            });
+
+
+            let average =
+                Math.round(
+                    total / times.length
+                );
+
+
+            let best =
+                Math.min(...times);
+
+
+            let worst =
+                Math.max(...times);
 
 
             document.getElementById("info").textContent =
-                "Gut gemacht! Drücke Start für eine neue Runde.";
+                "🎉 Runde beendet!";
+
+
+            document.getElementById("timer").innerHTML =
+                "Durchschnitt: " +
+                average +
+                " ms<br>" +
+                "🏆 Beste Zeit: " +
+                best +
+                " ms<br>" +
+                "🐢 Langsamste Zeit: " +
+                worst +
+                " ms";
 
         }
 
