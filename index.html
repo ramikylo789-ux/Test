@@ -1,10 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Reaktionsspiel</title>
+<title>🎯 Reaktionsspiel</title>
 
 <style>
 body {
@@ -20,7 +21,7 @@ h1 {
 }
 
 #info {
-    font-size: 20px;
+    font-size: 22px;
     margin: 10px;
 }
 
@@ -46,7 +47,6 @@ h1 {
     background: red;
     border-radius: 50%;
     position: absolute;
-    display: none;
     cursor: pointer;
 }
 
@@ -105,7 +105,7 @@ Letzte Zeit: -
 
 <div id="game">
 
-<div id="target" onclick="targetClicked()"></div>
+<div id="target"></div>
 
 </div>
 
@@ -116,6 +116,10 @@ Noch keine Ergebnisse.
 </div>
 
 <script>
+
+let target = document.getElementById("target");
+
+let game = document.getElementById("game");
 
 let startTime = 0;
 
@@ -134,22 +138,22 @@ function startGame() {
 
     times = [];
 
-    gameRunning = false;
+    gameRunning = true;
 
     document.getElementById("results").innerHTML =
         "Noch keine Ergebnisse.";
 
     document.getElementById("timer").textContent =
-        "Warte...";
+        "Bereit!";
 
-    nextRound();
+    nextTarget();
 
 }
 
 
-/* Nächste Runde */
+/* Neuen Punkt sofort anzeigen */
 
-function nextRound() {
+function nextTarget() {
 
     if (round >= 10) {
 
@@ -161,46 +165,11 @@ function nextRound() {
 
     round++;
 
-    gameRunning = false;
-
     document.getElementById("info").textContent =
         "Runde: " + round + " / 10";
 
-    document.getElementById("timer").textContent =
-        "Warte...";
 
-    document.getElementById("target").style.display =
-        "none";
-
-
-    /*
-    Der Punkt erscheint nach einer
-    zufälligen Zeit.
-    */
-
-    let waitTime =
-        Math.floor(Math.random() * 1500) + 500;
-
-
-    setTimeout(function() {
-
-        showTarget();
-
-    }, waitTime);
-
-}
-
-
-/* Punkt anzeigen */
-
-function showTarget() {
-
-    let target =
-        document.getElementById("target");
-
-    let game =
-        document.getElementById("game");
-
+    /* Zufällige Position */
 
     let maxX =
         game.clientWidth - 50;
@@ -223,16 +192,19 @@ function showTarget() {
         y + "px";
 
 
+    /* Punkt sichtbar machen */
+
     target.style.display =
         "block";
 
 
-    /* Timer starten */
+    /*
+    HIER startet die Zeit.
+    */
 
     startTime =
         performance.now();
 
-    gameRunning = true;
 
     document.getElementById("timer").textContent =
         "Zeit läuft...";
@@ -240,16 +212,16 @@ function showTarget() {
 }
 
 
-/* Punkt wurde geklickt */
+/* Punkt anklicken */
 
-function targetClicked() {
+target.addEventListener("click", function() {
 
     if (!gameRunning) {
-
         return;
-
     }
 
+
+    /* Zeit stoppen */
 
     let endTime =
         performance.now();
@@ -261,34 +233,32 @@ function targetClicked() {
         );
 
 
+    /* Zeit speichern */
+
     times.push(reactionTime);
 
 
-    gameRunning = false;
-
-
-    document.getElementById("target").style.display =
-        "none";
-
-
     document.getElementById("timer").textContent =
-        reactionTime + " ms";
+        "Letzte Zeit: " +
+        reactionTime +
+        " ms";
 
 
     showResults();
 
 
     /*
-    SOFORT nächste Runde.
+    WICHTIG:
+    Sofort den nächsten Punkt anzeigen.
     Keine Pause.
     */
 
-    nextRound();
+    nextTarget();
 
-}
+});
 
 
-/* Zeiten anzeigen */
+/* Ergebnisse anzeigen */
 
 function showResults() {
 
@@ -330,8 +300,7 @@ function finishGame() {
 
     gameRunning = false;
 
-
-    document.getElementById("target").style.display =
+    target.style.display =
         "none";
 
 
