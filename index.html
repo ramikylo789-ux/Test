@@ -1,56 +1,221 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="de">
-<meta charset="utf-8">
-<title>Fang den Punkt</title>
-<style>
-	body { margin:0; display:grid; place-items:center; height:100vh; background:#111; color:white; font:20px sans-serif }
-	main { text-align:center } canvas { display:block; background:#222; border:2px solid #555; cursor:crosshair }
-</style>
-<main>
-	<h1>Fang den Punkt</h1>
-	<p>Punkte: <b id="score">0</b> | Zeit: <b id="time">30</b>s</p>
-	<canvas id="game" width="600" height="400"></canvas>
-	<p id="message">Klicke auf den roten Punkt!</p>
-</main>
-<script>
-const canvas = document.querySelector('#game'), ctx = canvas.getContext('2d');
-const scoreEl = document.querySelector('#score'), timeEl = document.querySelector('#time');
-let score = 0, time = 30, x = 300, y = 200, radius = 22, playing = true;
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-function draw() {
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
-	if (!playing) return;
-	ctx.fillStyle = '#f44'; ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.fill();
-}
-function move() {
-	x = radius + Math.random() * (canvas.width - radius * 2);
-	y = radius + Math.random() * (canvas.height - radius * 2);
-	draw();
-}
-canvas.onclick = event => {
-	if (!playing) return;
-	const r = canvas.getBoundingClientRect();
-	const hit = Math.hypot(event.clientX - r.left - x, event.clientY - r.top - y) <= radius;
-	if (hit) { score++; scoreEl.textContent = score; move(); }
-};
-const clock = setInterval(() => {
-	if (--time <= 0) {
-		time = 0; playing = false; clearInterval(clock);
-		document.querySelector('#message').textContent = `Spiel vorbei! Du hast ${score} Punkte.`;
-	}
-	timeEl.textContent = time;
-}, 1000);
-move();
-</script>
-<div id="reactionTime">Reaktionszeit: 0 ms</div>
-let startTime = performance.now();
-let reactionTime = 0;
-	reactionTime = Math.round(performance.now() - startTime);
-console.log("Reaktionszeit: " + reactionTime + " ms");
+    <title>Reaktionsspiel</title>
 
-startTime = performance.now();
-	reactionTime = Math.round(performance.now() - startTime);
-document.getElementById("reactionTime").textContent =
-    "Reaktionszeit: " + reactionTime + " ms";
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #111;
+            color: white;
+            text-align: center;
+        }
 
-startTime = performance.now();
+        h1 {
+            margin-top: 30px;
+        }
+
+        #info {
+            font-size: 22px;
+            margin: 15px;
+        }
+
+        #game {
+            width: 90vw;
+            max-width: 700px;
+            height: 450px;
+            margin: 20px auto;
+            background: #222;
+            border: 3px solid white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #target {
+            width: 50px;
+            height: 50px;
+            background: red;
+            border-radius: 50%;
+            position: absolute;
+            display: none;
+            cursor: pointer;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 18px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        #start {
+            background: white;
+            color: black;
+        }
+
+        #home {
+            background: #444;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>🎯 Reaktionsspiel</h1>
+
+    <div id="info">
+        Klicke auf den roten Punkt so schnell wie möglich!
+    </div>
+
+    <div id="time">
+        Letzte Zeit: -
+    </div>
+
+    <div id="best">
+        Beste Zeit: -
+    </div>
+
+    <button id="start" onclick="startGame()">
+        ▶️ Start
+    </button>
+
+    <button id="home" onclick="location.href='../'">
+        🏠 Startseite
+    </button>
+
+    <div id="game">
+
+        <div id="target" onclick="targetClicked()"></div>
+
+    </div>
+
+    <script>
+
+        let startTime = 0;
+
+        let bestTime = null;
+
+        let gameRunning = false;
+
+
+        function startGame() {
+
+            gameRunning = false;
+
+            document.getElementById("info").textContent =
+                "Warte auf den Punkt...";
+
+            document.getElementById("target").style.display = "none";
+
+
+            // Zufällige Wartezeit
+            let waitTime =
+                Math.floor(Math.random() * 3000) + 1000;
+
+
+            setTimeout(function() {
+
+                showTarget();
+
+            }, waitTime);
+
+        }
+
+
+        function showTarget() {
+
+            let target =
+                document.getElementById("target");
+
+            let game =
+                document.getElementById("game");
+
+
+            // Zufällige Position
+            let maxX =
+                game.clientWidth - 50;
+
+            let maxY =
+                game.clientHeight - 50;
+
+
+            let x =
+                Math.random() * maxX;
+
+            let y =
+                Math.random() * maxY;
+
+
+            target.style.left = x + "px";
+
+            target.style.top = y + "px";
+
+
+            target.style.display = "block";
+
+
+            // ⏱️ Zeitmessung startet hier
+            startTime = performance.now();
+
+            gameRunning = true;
+
+        }
+
+
+        function targetClicked() {
+
+            if (!gameRunning) {
+                return;
+            }
+
+
+            // ⏱️ Zeitmessung stoppen
+            let endTime = performance.now();
+
+
+            let reactionTime =
+                Math.round(endTime - startTime);
+
+
+            gameRunning = false;
+
+
+            document.getElementById("target").style.display =
+                "none";
+
+
+            // Zeit anzeigen
+            document.getElementById("time").textContent =
+                "Letzte Zeit: " + reactionTime + " ms";
+
+
+            // Beste Zeit überprüfen
+            if (
+                bestTime === null ||
+                reactionTime < bestTime
+            ) {
+
+                bestTime = reactionTime;
+
+                document.getElementById("best").textContent =
+                    "🏆 Beste Zeit: " + bestTime + " ms";
+
+            }
+
+
+            document.getElementById("info").textContent =
+                "Gut gemacht! Drücke Start für eine neue Runde.";
+
+        }
+
+    </script>
+
+</body>
+</html>
