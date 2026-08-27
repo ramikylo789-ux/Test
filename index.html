@@ -1,382 +1,382 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reaktionsspiel</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #111;
-            color: white;
-            text-align: center;
-        }
+<title>Reaktionsspiel</title>
 
-        h1 {
-            margin-top: 25px;
-        }
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #111;
+    color: white;
+    text-align: center;
+}
 
-        #info {
-            font-size: 20px;
-            margin: 10px;
-        }
+h1 {
+    margin-top: 25px;
+}
 
-        #timer {
-            font-size: 24px;
-            margin: 10px;
-        }
+#info {
+    font-size: 20px;
+    margin: 10px;
+}
 
-        #game {
-            width: 90vw;
-            max-width: 700px;
-            height: 450px;
-            margin: 20px auto;
-            background: #222;
-            border: 3px solid white;
-            position: relative;
-            overflow: hidden;
-        }
+#timer {
+    font-size: 24px;
+    margin: 10px;
+}
 
-        #target {
-            width: 50px;
-            height: 50px;
-            background: red;
-            border-radius: 50%;
-            position: absolute;
-            display: none;
-            cursor: pointer;
-        }
+#game {
+    width: 90vw;
+    max-width: 700px;
+    height: 450px;
+    margin: 20px auto;
+    background: #222;
+    border: 3px solid white;
+    position: relative;
+    overflow: hidden;
+}
 
-        button {
-            padding: 12px 25px;
-            margin: 5px;
-            font-size: 18px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-        }
+#target {
+    width: 50px;
+    height: 50px;
+    background: red;
+    border-radius: 50%;
+    position: absolute;
+    display: none;
+    cursor: pointer;
+}
 
-        #start {
-            background: white;
-            color: black;
-        }
+button {
+    padding: 12px 25px;
+    margin: 5px;
+    font-size: 18px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+}
 
-        #home {
-            background: #444;
-            color: white;
-        }
+#start {
+    background: white;
+    color: black;
+}
 
-        #results {
-            max-width: 500px;
-            margin: 20px auto;
-            text-align: left;
-            font-size: 18px;
-        }
+#home {
+    background: #444;
+    color: white;
+}
 
-        .result {
-            padding: 8px;
-            border-bottom: 1px solid #444;
-        }
-    </style>
+#results {
+    max-width: 500px;
+    margin: 20px auto;
+    text-align: left;
+    font-size: 18px;
+}
+
+.result {
+    padding: 8px;
+    border-bottom: 1px solid #444;
+}
+</style>
 </head>
 
 <body>
 
-    <h1>🎯 Reaktionsspiel</h1>
+<h1>🎯 Reaktionsspiel</h1>
 
-    <div id="info">
-        Runde: 0 / 10
-    </div>
+<div id="info">
+Runde: 0 / 10
+</div>
 
-    <div id="timer">
-        Letzte Zeit: -
-    </div>
+<div id="timer">
+Letzte Zeit: -
+</div>
 
-    <button id="start" onclick="startGame()">
-        ▶️ Start
-    </button>
+<button id="start" onclick="startGame()">
+▶️ Start
+</button>
 
-    <button id="home" onclick="location.href='../'">
-        🏠 Startseite
-    </button>
+<button id="home" onclick="location.href='../'">
+🏠 Startseite
+</button>
 
-    <div id="game">
-        <div id="target" onclick="targetClicked()"></div>
-    </div>
+<div id="game">
 
-    <h2>📊 Deine Zeiten</h2>
+<div id="target" onclick="targetClicked()"></div>
 
-    <div id="results">
-        Noch keine Ergebnisse.
-    </div>
+</div>
 
-    <script>
+<h2>📊 Deine Zeiten</h2>
 
-        let startTime = 0;
+<div id="results">
+Noch keine Ergebnisse.
+</div>
 
-        let round = 0;
+<script>
 
-        let times = [];
+let startTime = 0;
 
-        let gameRunning = false;
+let round = 0;
 
-        let waiting = false;
+let times = [];
 
+let gameRunning = false;
 
-        function startGame() {
 
-            round = 0;
+/* Spiel starten */
 
-            times = [];
+function startGame() {
 
-            gameRunning = false;
+    round = 0;
 
-            waiting = false;
+    times = [];
 
-            document.getElementById("results").innerHTML =
-                "Noch keine Ergebnisse.";
+    gameRunning = false;
 
-            document.getElementById("timer").textContent =
-                "Letzte Zeit: -";
+    document.getElementById("results").innerHTML =
+        "Noch keine Ergebnisse.";
 
-            nextRound();
+    document.getElementById("timer").textContent =
+        "Warte...";
 
-        }
+    nextRound();
 
+}
 
-        function nextRound() {
 
-            if (round >= 10) {
+/* Nächste Runde */
 
-                finishGame();
+function nextRound() {
 
-                return;
+    if (round >= 10) {
 
-            }
+        finishGame();
 
+        return;
 
-            round++;
+    }
 
-            gameRunning = false;
+    round++;
 
-            waiting = true;
+    gameRunning = false;
 
+    document.getElementById("info").textContent =
+        "Runde: " + round + " / 10";
 
-            document.getElementById("info").textContent =
-                "Runde: " + round + " / 10";
+    document.getElementById("timer").textContent =
+        "Warte...";
 
-            document.getElementById("timer").textContent =
-                "Warte auf den Punkt...";
+    document.getElementById("target").style.display =
+        "none";
 
 
-            document.getElementById("target").style.display =
-                "none";
+    /*
+    Der Punkt erscheint nach einer
+    zufälligen Zeit.
+    */
 
+    let waitTime =
+        Math.floor(Math.random() * 1500) + 500;
 
-            // Zufällige Wartezeit zwischen 1 und 3 Sekunden
 
-            let waitTime =
-                Math.floor(Math.random() * 2000) + 1000;
+    setTimeout(function() {
 
+        showTarget();
 
-            setTimeout(function() {
+    }, waitTime);
 
-                showTarget();
+}
 
-            }, waitTime);
 
-        }
+/* Punkt anzeigen */
 
+function showTarget() {
 
-        function showTarget() {
+    let target =
+        document.getElementById("target");
 
-            let target =
-                document.getElementById("target");
+    let game =
+        document.getElementById("game");
 
-            let game =
-                document.getElementById("game");
 
+    let maxX =
+        game.clientWidth - 50;
 
-            let maxX =
-                game.clientWidth - 50;
+    let maxY =
+        game.clientHeight - 50;
 
-            let maxY =
-                game.clientHeight - 50;
 
+    let x =
+        Math.random() * maxX;
 
-            let x =
-                Math.random() * maxX;
+    let y =
+        Math.random() * maxY;
 
-            let y =
-                Math.random() * maxY;
 
+    target.style.left =
+        x + "px";
 
-            target.style.left =
-                x + "px";
+    target.style.top =
+        y + "px";
 
-            target.style.top =
-                y + "px";
 
+    target.style.display =
+        "block";
 
-            target.style.display =
-                "block";
 
+    /* Timer starten */
 
-            // Zeitmessung starten
+    startTime =
+        performance.now();
 
-            startTime =
-                performance.now();
+    gameRunning = true;
 
+    document.getElementById("timer").textContent =
+        "Zeit läuft...";
 
-            gameRunning = true;
+}
 
-            waiting = false;
 
+/* Punkt wurde geklickt */
 
-            document.getElementById("timer").textContent =
-                "Zeit läuft...";
+function targetClicked() {
 
-        }
+    if (!gameRunning) {
 
+        return;
 
-        function targetClicked() {
+    }
 
-            if (!gameRunning) {
 
-                return;
+    let endTime =
+        performance.now();
 
-            }
 
+    let reactionTime =
+        Math.round(
+            endTime - startTime
+        );
 
-            // Zeitmessung stoppen
 
-            let endTime =
-                performance.now();
+    times.push(reactionTime);
 
 
-            let reactionTime =
-                Math.round(
-                    endTime - startTime
-                );
+    gameRunning = false;
 
 
-            times.push(reactionTime);
+    document.getElementById("target").style.display =
+        "none";
 
 
-            gameRunning = false;
+    document.getElementById("timer").textContent =
+        reactionTime + " ms";
 
 
-            document.getElementById("target").style.display =
-                "none";
+    showResults();
 
 
-            document.getElementById("timer").textContent =
-                "Letzte Zeit: " +
-                reactionTime +
-                " ms";
+    /*
+    SOFORT nächste Runde.
+    Keine Pause.
+    */
 
+    nextRound();
 
-            showResults();
+}
 
 
-            // Kurz warten und nächste Runde starten
+/* Zeiten anzeigen */
 
-            setTimeout(function() {
+function showResults() {
 
-                nextRound();
+    let results =
+        document.getElementById("results");
 
-            }, 700);
 
-        }
+    results.innerHTML = "";
 
 
-        function showResults() {
+    times.forEach(function(time, index) {
 
-            let results =
-                document.getElementById("results");
+        let row =
+            document.createElement("div");
 
 
-            results.innerHTML = "";
+        row.className =
+            "result";
 
 
-            times.forEach(function(time, index) {
+        row.textContent =
+            "Runde " +
+            (index + 1) +
+            ": " +
+            time +
+            " ms";
 
-                let row =
-                    document.createElement("div");
 
+        results.appendChild(row);
 
-                row.className =
-                    "result";
+    });
 
+}
 
-                row.textContent =
-                    "Runde " +
-                    (index + 1) +
-                    ": " +
-                    time +
-                    " ms";
 
+/* Spiel beendet */
 
-                results.appendChild(row);
+function finishGame() {
 
-            });
+    gameRunning = false;
 
-        }
 
+    document.getElementById("target").style.display =
+        "none";
 
-        function finishGame() {
 
-            gameRunning = false;
+    let total = 0;
 
 
-            document.getElementById("target").style.display =
-                "none";
+    times.forEach(function(time) {
 
+        total += time;
 
-            let total = 0;
+    });
 
 
-            times.forEach(function(time) {
+    let average =
+        Math.round(
+            total / times.length
+        );
 
-                total += time;
 
-            });
+    let best =
+        Math.min(...times);
 
 
-            let average =
-                Math.round(
-                    total / times.length
-                );
+    let worst =
+        Math.max(...times);
 
 
-            let best =
-                Math.min(...times);
+    document.getElementById("info").textContent =
+        "🎉 10 Runden geschafft!";
 
 
-            let worst =
-                Math.max(...times);
+    document.getElementById("timer").innerHTML =
+        "⚡ Durchschnitt: " +
+        average +
+        " ms<br>" +
+        "🏆 Beste Zeit: " +
+        best +
+        " ms<br>" +
+        "🐢 Langsamste Zeit: " +
+        worst +
+        " ms";
 
+}
 
-            document.getElementById("info").textContent =
-                "🎉 Runde beendet!";
-
-
-            document.getElementById("timer").innerHTML =
-                "Durchschnitt: " +
-                average +
-                " ms<br>" +
-                "🏆 Beste Zeit: " +
-                best +
-                " ms<br>" +
-                "🐢 Langsamste Zeit: " +
-                worst +
-                " ms";
-
-        }
-
-    </script>
+</script>
 
 </body>
 </html>
